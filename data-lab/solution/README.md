@@ -35,11 +35,12 @@ We want to compute the `n`th byte of `x`.
 We are assuming 8-bit bytes and 32-bit `int`s,
 so the desired bytes of `x` in each case are
 | `n` | `x[<desired bytes>]` |
-| --- | -------------------- |
-| 0   | `x[0..7]`            |
-| 1   | `x[8..15]`           |
-| 2   | `x[16..23]`          |
-| 3   | `x[24..31]`          |
+| :-: | :------------------: |
+| `0` | `x[00..07]`          |
+| `1` | `x[08..15]`          |
+| `2` | `x[16..23]`          |
+| `3` | `x[24..31]`          |
+
 We achieve this by right-shifting `8 * n = n << 3` bytes and
 using `& 0xFF` to mask out any undesired higher bits.
 
