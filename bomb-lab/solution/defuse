@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# produce passwords to successfully defuse the bomb
+# Usage: ./defuse.sh [path to bomb]
+
+import sys
+import subprocess as sp
+from random import choice
+
+def phase_1(bomb, passwords):
+    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_1.gdb']
+                 , input='\n'.join(passwords)
+                 , stdout=sp.PIPE, text=True)
+    return proc.stdout.strip()
+
+def phase_2(bomb, passwords):
+    ints = [1] * 6
+    for i in range(1, len(ints)): ints[i] = (i+1) * ints[i-1]
+    return ' '.join(map(str, ints))
+
+def phase_3(bomb, passwords):
+    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_2.gdb']
+                 , input='\n'.join(passwords)
+                 , stdout=sp.PIPE, text=True)
+    choices = [ ' '.join(line.replace('|', '').strip().split())
+                for line
+                in proc.stdout.strip().split('\n')[2:] ]
+    return choice(choices)
+
+def phase_4(bomb, passwords):
+    fibs = [1, 1]
+    while fibs[-1] != 0x37: fibs.append(fibs[-1] + fibs[-2])
+    return str(len(fibs) - 1)
+
+def phase_5(bomb, passwords):
+    table   = 'isrveawhobpnutfg'
+    target  = 'giants'
+    choices = []
+    for i, c in enumerate(target):
+        lo = table.index(c)
+        choices.append(choice([ c
+                                for hi in range(8)
+                                for c in chr(lo+(hi<<4))
+                                if c.isalnum() ]))
+    return ''.join(choices)
+
+def phase_6(bomb, passwords):
+    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_6.gdb']
+                 , input='\n'.join(passwords)
+                 , stdout=sp.PIPE, text=True)
+    nodes = []
+    for line in proc.stdout.strip().split('\n')[2:]:
+        i, v = line.replace('|', '').strip().split()
+        nodes.append((int(v), i))
+    return ' '.join([i for (v,i) in sorted(nodes)])
+
+def patch_for_secret_access(passwords):
+    passwords[3] += ' austinpowers'
+
+def secret_phase(bomb, passwords):
+    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/binary_tree.py', '-x=scripts/secret_phase.gdb']
+                 , input='\n'.join(passwords)
+                 , stdout=sp.PIPE, text=True)
+    choices = []
+    for line in proc.stdout.strip().split('\n')[2:]:
+        v, f = line.replace('|', '').strip().split()[:2]
+        if int(f, 16) == 0x7:
+            choices.append(v)
+    return choice(choices)
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: {} [path to bomb]'.format(sys.argv[0]))
+        exit()
+    bomb      = sys.argv[1]
+    passwords = []
+
+    phases = [ phase_1
+             , phase_2
+             , phase_3
+             , phase_4
+             , phase_5
+             , phase_6 ]
+    for phase in phases:
+        next_password = phase(bomb, passwords)
+        passwords.append(next_password)
+
+    patch_for_secret_access(passwords)
+
+    secret_password = secret_phase(bomb, passwords)
+    passwords.append(secret_password)
+
+    print('\n'.join(passwords))
