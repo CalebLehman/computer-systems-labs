@@ -7,7 +7,7 @@ import subprocess as sp
 from random import choice
 
 def phase_1(bomb, passwords):
-    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_1.gdb']
+    proc = sp.run( ['gdb', '-nx', bomb, '-batch', '-x=scripts/phase_1.gdb']
                  , input='\n'.join(passwords)
                  , stdout=sp.PIPE, text=True)
     return proc.stdout.strip()
@@ -18,7 +18,7 @@ def phase_2(bomb, passwords):
     return ' '.join(map(str, ints))
 
 def phase_3(bomb, passwords):
-    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_2.gdb']
+    proc = sp.run( ['gdb', '-nx', bomb, '-batch', '-x=scripts/phase_2.gdb']
                  , input='\n'.join(passwords)
                  , stdout=sp.PIPE, text=True)
     choices = [ ' '.join(line.replace('|', '').strip().split())
@@ -44,7 +44,7 @@ def phase_5(bomb, passwords):
     return ''.join(choices)
 
 def phase_6(bomb, passwords):
-    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/phase_6.gdb']
+    proc = sp.run( ['gdb', '-nx', bomb, '-batch', '-x=scripts/phase_6.gdb']
                  , input='\n'.join(passwords)
                  , stdout=sp.PIPE, text=True)
     nodes = []
@@ -57,7 +57,7 @@ def patch_for_secret_access(passwords):
     passwords[3] += ' austinpowers'
 
 def secret_phase(bomb, passwords):
-    proc = sp.run( ['gdb', bomb, '-batch', '-x=scripts/binary_tree.py', '-x=scripts/secret_phase.gdb']
+    proc = sp.run( ['gdb', '-nx', bomb, '-batch', '-x=scripts/binary_tree.py', '-x=scripts/secret_phase.gdb']
                  , input='\n'.join(passwords)
                  , stdout=sp.PIPE, text=True)
     choices = []
