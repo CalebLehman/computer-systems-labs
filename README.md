@@ -6,7 +6,7 @@ My "write-ups"/work/solutions for the self-study labs provided on the
 Lab completion progress:
   - [x] Data Lab
   - [x] Bomb Lab
-  - [ ] Buffer Lab
+  - [x] Buffer Lab
   - [ ] Architecture Lab
   - [ ] Cache Lab
   - [ ] Malloc Lab
