@@ -12,6 +12,6 @@ Lab completion progress:
   - [x] Bomb Lab
   - [x] Buffer Lab
   - [ ] Architecture Lab
-  - [ ] Cache Lab
+  - [x] Cache Lab
   - [ ] Malloc Lab
   - [ ] Proxy Lab
